@@ -1,13 +1,9 @@
 %=========================
-%this program is used for spectrum rid of characteristic peaks
+%this program is used for 1D Fourier Imaging
 %=========================
 
-%% parameter
-a0=5*10^(-8);%NV distance
-aa0=a0*10^(6);%convert the average distance of NV into um
-HW=0.8*10^(-8);%half width of the magnetic field distribution
+%% constant
 %lamda=100;%distance (pixel size) between two peaks
-B0=0.2;%amplitude of the magnetic field Gauss ,therefore phi_s(x)=2pi*gamma*T2*B_max won't exceeds 2pi, avoids the dillemma
 gamma=2.803;%gyromagnetic ratio
 int=10^(-9);%pixel size 1 nm
 Size=10^(-6);%sample size 1000nm
@@ -15,6 +11,11 @@ n_read=Size/a0;%readout 11 NV at once
 N=1000;%number of points
 %Bg=20;%max gradient
 pixel=int*10^6;
+
+%% parameter NV related
+a0=5*10^(-8);%NV distance
+aa0=a0*10^(6);%convert the average distance of NV into um
+HW=0.8*10^(-8);%half width of the magnetic field distribution
 T2=0.3;%T2* 0.3us
 C=1;%contrast 1
 distance=ceil(a0/int);
@@ -22,13 +23,15 @@ n_spin=ceil(N/distance);%number of spins
 space=n_spin/n_read;
 delta_x=a0*10^6;%distance between NV centers in scale of um
 delta_k=1/Size/10^(6);%field of view
+count=50; %photon counts
+
+%% parameter material related
 num_pks=91;%settled due to lamda,the actual frequency would be 1000/ceil(1000/77)=76.9
 lamda=ceil(N/num_pks);%distance (pixel size) between two peaks
-count=50; %photon counts
+B0=0.2;%amplitude of the magnetic field Gauss ,therefore phi_s(x)=2pi*gamma*T2*B_max won't exceeds 2pi, avoids the dillemma
 
 %% %NV's position relative to the magnetic field
 pos_NV=position(n_spin,distance,N);
-
 
 %% scanning part
 spacing=80; %real space scanning 50 nm
@@ -66,7 +69,6 @@ B=BB(N/2+1+start(ii)+4900:3*N/2+start(ii)+4900);
 %B=BB(N/2*Npixel+1+start(ii)*Npixel+4900*Npixel:3*N/2*Npixel+start(ii)*Npixel+4900*Npixel);
 %% Ramsey sequence
 
-
 %%%% differeny K series options
 % K=sort(Kmax*rand(1,Kmax));
 % K=sort(K);
@@ -79,14 +81,14 @@ B=BB(N/2+1+start(ii)+4900:3*N/2+start(ii)+4900);
 % FFT = dftmtx(N);
 % A_FFT=FFT(1:Kmax(ii)+1,:);
 
-%% l2 norm 2020/7/21
+%% l2 norm 
 % [G1]=L2_norm(A_FFT,S');
 % ABS_norm2=abs(G1);
 % ABS_norm2=ABS_norm2./max(ABS_norm2);
 % PHA_norm2=angle(G1);
 
 
-%% L1 norm 2020/7/22
+%% L1 norm 
 % N = size(A_FFT,2);  %Signal dimension
 % 
 % cvx_begin 
@@ -153,7 +155,7 @@ end
 % xlabel('x/um')
 % ylabel('amp')
 
-%% plomb for non-uniform sampling 2020/7/8
+%% plomb for non-uniform sampling 
 tn=XX;
 n=yy-mean(yy);
 
